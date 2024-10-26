@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אוסף סמלים אטומיים</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #e6f3ff;
+        }
+        #gameContainer {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        #startScreen, #gameScreen, #levelCompleteScreen, #failScreen, #gameEndScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #e6f3ff;
+        }
+        #startScreen {
+            background-image: url('https://www.cjoint.com/doc/24_10/NJzhewGS3KJ_1010.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 1vh;
+        }
+        #startButton {
+            margin-top: -58vh;
+        }
+
+        #startScreen h1 {
+            margin-bottom: 20px;
+            font-size: 32px;
+            color: white;
+            text-shadow: 2px 2px 5px black;
+        }
+        .button {
+            padding: 20px 55px;
+            font-size: 20px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        #gameScreen, #levelCompleteScreen, #failScreen, #gameEndScreen {
+            display: none;
+        }
+        #levelCompleteScreen {
+            background-image: url('https://www.cjoint.com/doc/24_09/NICf4N6hiO6_2.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center bottom;
+        }
+        #scoreDisplay {
+            height: 50px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            font-weight: bold
+        }
+        #timeDisplay, #levelDisplay, #scoreDisplayText, #trophyDisplay {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 15px;
+            border-radius: 5px;
+            margin: 0 10px;
+        }
+        #gameArea {
+            flex-grow: 1;
+            position: relative;
+            background-color: #d4e1f7;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            max-width: 400px;
+            width: 100%;
+        }
+        #controls {
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        .control-button {
+            width: 60px;
+            height: 60px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 10%;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            margin: 5px;
+        }
+        #player {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            background-image: url('https://www.cjoint.com/doc/24_09/NIjpQMgT6i6_0909.png');
+            background-size: cover;
+        }
+        .atom {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+        }
+        @keyframes fireworks {
+            0% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1.5); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+        .firework {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background-image: url('https://path_to_fireworks_image.png');
+            background-size: cover;
+            animation: fireworks 1.5s infinite;
+        }
+        #trophyScreen, #nextLevelScreen {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="startScreen">
+            <h1>אוסף סמלים אטומיים</h1>
+            <button id="startButton" class="button">התחל</button>
+        </div>
+        <div id="gameScreen">
+<div id="scoreDisplay">
+    <div id="timeDisplay">זמן: 0 שניות</div>
+    <div id="levelDisplay">רמה: 1</div> <!-- הצגת הרמה הנוכחית -->
+    <div id="stageDisplay">שלב: 1</div> <!-- הצגת השלב הנוכחי -->
+    <div id="scoreDisplayText">ניקוד: 0</div>
+    <div id="trophyDisplay"></div>
+</div>
+
+            <div id="gameArea">
+                <div id="player"></div>
+            </div>
+            <div id="controls">
+                <button class="control-button" id="upButton">↑</button>
+                <button class="control-button" id="leftButton">←</button>
+                <button class="control-button" id="downButton">↓</button>
+                <button class="control-button" id="rightButton">→</button>
+            </div>
+        </div>
+        <div id="levelCompleteScreen">
+            <h2>כל הכבוד! סיימת את השלב</h2>
+            <button id="nextLevelButton" class="button">לשלב הבא</button>
+        </div>
+        <div id="failScreen">
+            <h2>לא צברת את הניקוד הדרוש</h2>
+            <button id="retryButton" class="button">נסה שנית</button>
+        </div>
+        <div id="gameEndScreen">
+            <h2>כל הכבוד! סיימת את כל השלבים</h2>
+            <div class="firework" style="top: 20%; left: 40%;"></div>
+            <div class="firework" style="top: 50%; left: 60%;"></div>
+            <div class="firework" style="top: 70%; left: 30%;"></div>
+            <button id="restartGameButton" class="button">התחל מחדש</button>
+        </div>
+        <div id="trophyScreen" style="display: none;">
+            <h2>יפה מאוד! זכית בגביע!</h2>
+            <img src="https://www.cjoint.com/doc/24_09/NICf4N6hiO6_2.png" alt="trophy" style="width: 150px; height: 150px;">
+            <button id="continueButton" class="button">המשך לשלב הבא</button>
+        </div>
+        <div id="nextLevelScreen" style="display: none;">
+            <h2>כל הכבוד! עברת רמה</h2>
+            <button id="toNextLevelButton" class="button">לרמה הבאה</button>
+        </div>
+    </div>
+
+    <script>
+        const levels = [
+            { time: 30, targetScore: 5, trophies: [] },
+            { time: 20, targetScore: 5, trophies: [] },
+            { time: 10, targetScore: 5, trophies: [] }
+        ];
+
+        let currentLevelIndex = 0;
+        let levelAttempts = 0;
+        let gameState = {
+            playerPosition: { x: 0, y: 0 },
+            atoms: [],
+            score: 0,
+            timeLeft: levels[0].time
+        };
+
+        const positiveSound = new Audio('positivesound.mp3');
+        const negativeSound = new Audio('negativesound.mp3');
+         
+        window.addEventListener('load', function() {
+            document.getElementById('startButton').addEventListener('click', startGame);
+            document.getElementById('retryButton').addEventListener('click', retryLevel);
+            document.getElementById('nextLevelButton').addEventListener('click', nextLevel);
+            document.getElementById('restartGameButton').addEventListener('click', startGame);
+
+            document.getElementById('rightButton').addEventListener('mousedown', () => movePlayer('ArrowRight'));
+            document.getElementById('upButton').addEventListener('mousedown', () => movePlayer('ArrowUp'));
+            document.getElementById('downButton').addEventListener('mousedown', () => movePlayer('ArrowDown'));
+            document.getElementById('leftButton').addEventListener('mousedown', () => movePlayer('ArrowLeft'));
+
+            document.addEventListener('keydown', (event) => {
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+                    event.preventDefault();
+                    movePlayer(event.key);
+                }
+            });
+        });
+
+let totalGameTime = 0; // משתנה לשעון הפנימי הכולל
+
+function startGame() {
+    stopMove(); // עצירה של כל תזוזה קודמת
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('gameScreen').style.display = 'flex';
+    currentLevelIndex = 0;
+    levelAttempts = 0;
+    totalGameTime = 0;
+    resetGameState();
+    createAtoms();
+    updateLevelDisplay();
+    startTimer();
+    startTotalGameTimer();
+}
+
+
+function startTotalGameTimer() {
+    clearInterval(gameState.totalTimer);
+    gameState.totalTimer = setInterval(() => {
+        totalGameTime++; // העלאת השעון הפנימי בכל שנייה
+    }, 1000);
+}
+
+
+
+function resetGameState() {
+    const gameArea = document.getElementById('gameArea');
+    gameState.playerPosition = {
+        x: (gameArea.clientWidth - 60) / 2,
+        y: (gameArea.clientHeight - 60) / 2
+    };
+
+    gameState.atoms.forEach(atom => atom.remove());
+    gameState.atoms = [];
+    gameState.score = 0;
+    updatePlayerPosition();
+    updateScore();
+    updateLevelDisplay();
+}
+
+
+function updateLevelDisplay() {
+    document.getElementById('levelDisplay').textContent = `רמה: ${currentLevelIndex + 1}`;
+    document.getElementById('stageDisplay').textContent = `שלב: ${levelAttempts + 1}`;
+}
+
+        function updateTrophyDisplay() {
+            const trophyDisplay = document.getElementById('trophyDisplay');
+            trophyDisplay.innerHTML = '';
+            levels[currentLevelIndex].trophies.forEach(trophy => {
+                const trophyImg = document.createElement('img');
+                trophyImg.src = `https://www.cjoint.com/doc/24_09/NICf4N6hiO6_2.png`;
+                trophyImg.alt = trophy;
+                trophyImg.style.width = '20px';
+                trophyImg.style.height = '20px';
+                trophyDisplay.appendChild(trophyImg);
+            });
+        }
+       // החלף את הפונקציה createAtoms הקיימת בפונקציה החדשה
+function createAtoms() {
+    console.log("createAtoms called");
+    const gameArea = document.getElementById('gameArea');
+    const atomCount = 16;
+    const validSymbols = ['H', 'O', 'N', 'K', 'Na', 'Li', 'F', 'Be', 'Mg', 'Ca', 'He', 'Cl', 'B'];
+    const invalidSymbols = ['X', 'Z', 'Y', 'Q', 'R', 'bA', 'aS', 'sI', 'FE', 'CS', 'ag', 'fr', 'al'];
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#F1948A', '#82E0AA', '#5DADE2'];
+
+    // נקה אטומים קיימים
+    gameState.atoms.forEach(atom => atom.remove());
+    gameState.atoms = [];
+
+    const selectedValidSymbols = [...validSymbols].sort(() => 0.5 - Math.random()).slice(0, 8);
+    const selectedInvalidSymbols = [...invalidSymbols].sort(() => 0.5 - Math.random()).slice(0, 8);
+
+    // יצירת רשת של נקודות אפשריות
+    const atomSize = 67;
+    const padding = 35; // מרווח מינימלי בין אטומים
+    const gridSize = Math.sqrt(atomCount) + 1; // מספר התאים בכל שורה/עמודה
+    const cellSize = atomSize + padding;
+    
+    // יצירת מערך של כל הנקודות האפשריות
+    const possiblePositions = [];
+    for (let i = 0; i < gridSize; i++) {
+        for (let j = 0; j < gridSize; j++) {
+            const x = j * cellSize + padding;
+            const y = i * cellSize + padding;
+            // בדיקה שהנקודה בתוך גבולות המשחק
+            if (x + atomSize <= gameArea.clientWidth && y + atomSize <= gameArea.clientHeight) {
+                possiblePositions.push({ x, y });
+            }
+        }
+    }
+
+    // ערבוב המיקומים האפשריים
+    const shuffledPositions = [...possiblePositions].sort(() => 0.5 - Math.random());
+
+    // פונקציה לבדיקת מרחק מהשחקן
+    function isValidPlayerDistance(pos) {
+        const playerRect = {
+            x: gameState.playerPosition.x,
+            y: gameState.playerPosition.y,
+            width: 60,
+            height: 60
+        };
+        const atomRect = {
+            x: pos.x,
+            y: pos.y,
+            width: atomSize,
+            height: atomSize
+        };
+        return !isOverlappingObject(atomRect, playerRect);
+    }
+
+    // יצירת האטומים
+    let atomsCreated = 0;
+    let positionIndex = 0;
+
+    while (atomsCreated < atomCount && positionIndex < shuffledPositions.length) {
+        const position = shuffledPositions[positionIndex];
+        
+        if (isValidPlayerDistance(position)) {
+            const atom = document.createElement('div');
+            atom.className = 'atom';
+            atom.textContent = atomsCreated < 6
+                ? selectedValidSymbols[atomsCreated]
+                : selectedInvalidSymbols[atomsCreated - 6];
+            atom.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            atom.style.left = `${position.x}px`;
+            atom.style.top = `${position.y}px`;
+
+            gameArea.appendChild(atom);
+            gameState.atoms.push(atom);
+            atomsCreated++;
+        }
+        
+        positionIndex++;
+    }
+
+    // בדיקה אם נוצרו כל האטומים הנדרשים
+    if (atomsCreated < atomCount) {
+        console.warn(`Could only place ${atomsCreated} out of ${atomCount} atoms safely`);
+    }
+}
+
+// פונקציה משופרת לבדיקת חפיפה
+function isOverlappingObject(obj1, obj2) {
+    const padding = 40; // מרווח מינימלי קבוע
+    
+    // חישוב מרכזי העצמים
+    const center1 = {
+        x: obj1.x + obj1.width / 2,
+        y: obj1.y + obj1.height / 2
+    };
+    
+    const center2 = {
+        x: obj2.x + obj2.width / 2,
+        y: obj2.y + obj2.height / 2
+    };
+    
+    // חישוב המרחק בין המרכזים
+    const distanceX = Math.abs(center1.x - center2.x);
+    const distanceY = Math.abs(center1.y - center2.y);
+    
+    // המרחק המינימלי הנדרש כולל padding
+    const minDistanceX = (obj1.width + obj2.width) / 2 + padding;
+    const minDistanceY = (obj1.height + obj2.height) / 2 + padding;
+    
+    return distanceX < minDistanceX && distanceY < minDistanceY;
+}
+
+function startTimer() {
+    clearInterval(gameState.timer); // איפוס טיימר קודם אם קיים
+
+    gameState.timeLeft = levels[currentLevelIndex].time; // זמן התחלתי בהתאם לרמה הנוכחית
+    updateTimeDisplay(); // עדכון ראשוני של הזמן בתצוגה
+
+    gameState.timer = setInterval(() => {
+        if (gameState.timeLeft > 0) {
+            gameState.timeLeft--;
+            updateTimeDisplay();
+        } else {
+            clearInterval(gameState.timer);
+            if (gameState.score >= levels[currentLevelIndex].targetScore) {
+                 checkCompletion();
+            } else {
+                showFailScreen();
+            }
+        }
+    }, 1000); // ספירה לאחור כל שנייה
+}
+
+
+
+
+// חלק 1: תיקון למעבר בין הרמות
+function checkCompletion() {
+    // נוודא שמעבירים לשלב הבא או לרמה הבאה בצורה מבוקרת
+    if (levelAttempts < 2) { 
+        handleStageCompletion(); // מעבר לשלב הבא באותה רמה
+    } else {
+        handleLevelCompletion(); // סיום שלב אחרון ברמה, מעבר לרמה הבאה
+    }
+}
+
+// פונקציה לניהול המעבר בין שלבים
+function handleStageCompletion() {
+    levelAttempts++; // עדכון לעבור לשלב הבא
+    document.getElementById('gameScreen').style.display = 'none';
+    document.getElementById('trophyScreen').style.display = 'flex';
+    document.getElementById('trophyScreen').querySelector('h2').textContent = 'יפה מאוד! סיימת את השלב';
+
+    document.getElementById('continueButton').onclick = function() {
+        document.getElementById('trophyScreen').style.display = 'none';
+        document.getElementById('gameScreen').style.display = 'flex';
+        resetGameState(); // התחלת מצב חדש עבור השלב הבא
+        createAtoms();
+        updateLevelDisplay();
+        startTimer(); // הפעלת הטיימר מחדש עבור השלב הבא
+    };
+}
+
+// פונקציה לניהול המעבר לרמה הבאה
+function handleLevelCompletion() {
+    stopMove(); // עצירה של כל תזוזה קודמת
+    if (currentLevelIndex === 2 && levelAttempts === 2) { // סיום המשחק אחרי רמה 3 שלב 3
+        clearInterval(gameState.totalTimer);
+        showEndScreen();
+    } else {
+        levelAttempts = 0;
+        currentLevelIndex++;
+        document.getElementById('gameScreen').style.display = 'none';
+        document.getElementById('nextLevelScreen').style.display = 'flex';
+        document.getElementById('nextLevelScreen').querySelector('h2').textContent = 'כל הכבוד! עברת רמה';
+
+        document.getElementById('toNextLevelButton').onclick = function() {
+            document.getElementById('nextLevelScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'flex';
+            resetGameState();
+            createAtoms();
+            updateLevelDisplay();
+            startTimer();
+        };
+    }
+}
+
+
+
+// חלק 2: הוספת פונקציה לתזוזה רציפה על ידי לחיצה ממושכת
+let moveInterval; // משתנה גלובלי לשמירת האינטרוול של תנועת הדמות
+
+
+function startMove(direction) {
+    movePlayer(direction);
+    moveInterval = setInterval(() => movePlayer(direction), 100); // הפעלה של תנועה כל 100 מילי שניות
+}
+
+function stopMove() {
+    clearInterval(moveInterval);
+}
+
+
+document.getElementById('rightButton').addEventListener('touchstart', () => startMove('ArrowRight'));
+document.getElementById('upButton').addEventListener('touchstart', () => startMove('ArrowUp'));
+document.getElementById('downButton').addEventListener('touchstart', () => startMove('ArrowDown'));
+document.getElementById('leftButton').addEventListener('touchstart', () => startMove('ArrowLeft'));
+
+document.getElementById('rightButton').addEventListener('touchend', stopMove);
+document.getElementById('upButton').addEventListener('touchend', stopMove);
+document.getElementById('downButton').addEventListener('touchend', stopMove);
+document.getElementById('leftButton').addEventListener('touchend', stopMove);
+
+
+
+function retryLevel() {
+    stopMove(); // עצירה של כל תזוזה קודמת
+    document.getElementById('failScreen').style.display = 'none';
+    document.getElementById('gameScreen').style.display = 'flex';
+    resetGameState();
+    createAtoms();
+    updateLevelDisplay();
+    startTimer();
+}
+
+
+
+        function showFailScreen() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('failScreen').style.display = 'flex';
+        }
+
+function nextLevel() {
+    if (levelAttempts < 2) { // המשך שלב פנימי ברמה הנוכחית
+        levelAttempts++;
+        document.getElementById('trophyScreen').style.display = 'flex';
+        document.getElementById('trophyScreen').querySelector('h2').textContent = 'יפה מאוד! סיימת את השלב';
+
+        document.getElementById('continueButton').onclick = function() {
+            document.getElementById('trophyScreen').style.display = 'none';
+            resetGameState();
+            createAtoms();
+            updateLevelDisplay(); // עדכון רמה ושלב עבור כל שלב ברמה
+            startTimer();
+            document.getElementById('failScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'flex';
+        };
+    } else { // מעבר רמה לאחר שלב שלישי
+        levelAttempts = 0;
+        if (currentLevelIndex < levels.length - 1) {
+            currentLevelIndex++;
+            document.getElementById('nextLevelScreen').style.display = 'flex';
+            document.getElementById('nextLevelScreen').querySelector('h2').textContent = 'כל הכבוד! עברת רמה';
+
+            document.getElementById('toNextLevelButton').onclick = function() {
+                document.getElementById('nextLevelScreen').style.display = 'none';
+                resetGameState();
+                createAtoms();
+                updateLevelDisplay(); // עדכון רמה חדשה במעבר לרמה
+                startTimer();
+                document.getElementById('failScreen').style.display = 'none';
+                document.getElementById('gameScreen').style.display = 'flex';
+            };
+        } else { // סיום המשחק לאחר רמה 3
+            showEndScreen();
+        }
+    }
+}
+
+        function showTrophyScreen() {
+            document.getElementById('trophyScreen').style.display = 'flex';
+
+            document.getElementById('continueButton').onclick = function() {
+                document.getElementById('trophyScreen').style.display = 'none';
+                document.getElementById('gameScreen').style.display = 'flex';
+
+                const trophyImg = document.createElement('img');
+                trophyImg.src = 'https://www.cjoint.com/doc/24_09/NICf4N6hiO6_2.png';
+                trophyImg.alt = 'trophy';
+                trophyImg.style.width = '20px';
+                trophyImg.style.height = '20px';
+                document.getElementById('trophyDisplay').appendChild(trophyImg);
+
+                levelAttempts++;
+                resetGameState();
+                createAtoms();
+                startTimer();
+            };
+        }
+
+function showEndScreen() {
+    document.getElementById('gameScreen').style.display = 'none';
+    document.getElementById('gameEndScreen').style.display = 'flex';
+    document.getElementById('gameEndScreen').querySelector('h2').textContent = `כל הכבוד! סיימת את המשחק. זמנך הוא: ${totalGameTime} שניות`;
+
+    const gameEndScreen = document.getElementById('gameEndScreen');
+    const firework1 = document.createElement('div');
+    const firework2 = document.createElement('div');
+    firework1.className = 'firework';
+    firework2.className = 'firework';
+    firework1.style.top = '20%'; firework1.style.left = '40%';
+    firework2.style.top = '70%'; firework2.style.left = '60%';
+    gameEndScreen.appendChild(firework1);
+    gameEndScreen.appendChild(firework2);
+
+    document.getElementById('restartGameButton').addEventListener('click', () => {
+        document.getElementById('gameEndScreen').style.display = 'none';
+        document.getElementById('startScreen').style.display = 'flex';
+        currentLevelIndex = 0;
+        levelAttempts = 0;
+        totalGameTime = 0;
+        resetGameState(); // אתחול מצב המשחק
+        createAtoms(); // יצירת כדורים עם התחלת משחק חדש
+        updateLevelDisplay(); // עדכון התצוגה
+    });
+}
+
+
+
+function updateTimeDisplay() {
+    document.getElementById('timeDisplay').textContent = `זמן: ${gameState.timeLeft} שניות`;
+}
+
+
+        function updateScore() {
+            document.getElementById('scoreDisplayText').textContent = `ניקוד: ${gameState.score}`;
+        }
+
+        function updatePlayerPosition() {
+            const player = document.getElementById('player');
+            player.style.left = `${gameState.playerPosition.x}px`;
+            player.style.top = `${gameState.playerPosition.y}px`;
+        }
+
+        function movePlayer(direction) {
+            const speed = 10;
+            const gameArea = document.getElementById('gameArea');
+            const gameAreaHeight = gameArea.clientHeight - 60;
+            const gameAreaWidth = gameArea.clientWidth - 60;
+
+            switch (direction) {
+                case 'ArrowUp':
+                    gameState.playerPosition.y = Math.max(0, gameState.playerPosition.y - speed);
+                    break;
+                case 'ArrowDown':
+                    gameState.playerPosition.y = Math.min(gameAreaHeight, gameState.playerPosition.y + speed);
+                    break;
+                case 'ArrowLeft':
+                    gameState.playerPosition.x = Math.max(0, gameState.playerPosition.x - speed);
+                    break;
+                case 'ArrowRight':
+                    gameState.playerPosition.x = Math.min(gameAreaWidth, gameState.playerPosition.x + speed);
+                    break;
+            }
+            updatePlayerPosition();
+            checkCollision();
+        }
+
+function checkCollision() {
+    const playerRect = document.getElementById('player').getBoundingClientRect();
+    gameState.atoms.forEach((atom, index) => {
+        const atomRect = atom.getBoundingClientRect();
+        if (
+            playerRect.right > atomRect.left &&
+            playerRect.left < atomRect.right &&
+            playerRect.bottom > atomRect.top &&
+            playerRect.top < atomRect.bottom
+        ) {
+            atom.remove();
+            gameState.atoms.splice(index, 1);
+
+            if (['H', 'O', 'N', 'K', 'Na', 'Li', 'F', 'Be', 'Mg', 'Ca', 'He', 'Cl', 'B'].includes(atom.textContent)) {
+                gameState.score++;
+                positiveSound.play();
+            } else {
+                gameState.score--;
+                negativeSound.play();
+            }
+            updateScore();
+
+            // בדיקה אם הושג ניקוד מספיק
+            if (gameState.score >= levels[currentLevelIndex].targetScore) {
+                checkCompletion();
+            } else {
+                checkLevelCompletion();
+            }
+        }
+    });
+}
+
+
+
+function checkLevelCompletion() {
+    // בדיקה אם יש כדורים תקינים שנותרו
+    const validAtomsLeft = gameState.atoms.some(atom => 
+        ['H', 'O', 'N', 'K', 'Na', 'Li', 'F', 'Be', 'Mg', 'Ca', 'He', 'Cl', 'B'].includes(atom.textContent)
+    );
+    
+    // אם אין יותר כדורים תקינים והניקוד לא מספיק, הצג הודעת כישלון
+    if (!validAtomsLeft && gameState.score < levels[currentLevelIndex].targetScore) {
+        showFailScreen();
+        return;
+    }
+
+    // בדיקה אם הושג ניקוד מספיק או שהזמן נגמר
+    if (gameState.score >= levels[currentLevelIndex].targetScore || gameState.timeLeft <= 0) {
+        checkCompletion();
+    }
+}
+
+
+    </script>
+</body>
+</html>
